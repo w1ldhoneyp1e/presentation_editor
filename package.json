@@ -1,0 +1,22 @@
+{
+  "name": "presentation_editor",
+  "version": "1.0.0",
+  "description": "frontend project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/w1ldhoneyp1e/presentation_editor.git"
+  },
+  "author": "Yashmetov Kirill",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/w1ldhoneyp1e/presentation_editor/issues"
+  },
+  "homepage": "https://github.com/w1ldhoneyp1e/presentation_editor#readme",
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}
