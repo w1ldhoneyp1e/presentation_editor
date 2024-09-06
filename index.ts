@@ -2,6 +2,10 @@ enum TypeOfObject {
     slides,
     contents
 }
+enum BackgroundTypes {
+    color,
+    picture
+}
 enum Size {
     width,
     height
@@ -15,15 +19,14 @@ type Presentation = {
 type SlidesCollection = {
     id: number,
     presentationId: number,
-    slides: Slide[], // Хранить слайдами или их айдишниками?
-    length: number
+    slides: Slide[]
 }
 type Slide = {
     id: number,
     collectionId: number,
     index: number,
-    contentObjects: any[], // Добавить тип или хранить айдишниками объектов?
-    background: string
+    contentObjects: any[],
+    background: Background
 }
 type ObjectsSelection = {
     ids: number[],
@@ -42,6 +45,10 @@ type PictureObj = {
     x: number,
     y: number,
     size: Size
+}
+type Background = {
+    value: string,
+    type: BackgroundTypes
 }
 
 // изменение названия презентации
@@ -156,7 +163,7 @@ function textFamilySet(text:TextObj, newTextFamily: string): TextObj {
 }
 
 // изменение фона слайда
-function slideBackgroundSet(slide:Slide, newBackground: string): Slide {
+function slideBackgroundSet(slide:Slide, newBackground: Background): Slide {
     return {
         ...slide,
         background: newBackground
