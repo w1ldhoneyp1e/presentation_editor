@@ -60,21 +60,16 @@ function addSlide(slidesCollection:SlidesCollection, slide: Slide): SlidesCollec
 }
 function deleteSlide(slidesCollection:SlidesCollection, slideToDelete: Slide): SlidesCollection {
     let collection = slidesCollection;
-    // let slideFound = false
-    // collection.slides.forEach(slide => {
-    //     if (slideFound) {
-    //         slide.index--
-    //     }
-    //     if (slide === slideToDelete) {
-    //         slidesCollection.slides.push(slide);
-    //         slideFound = true;
-    //     }
-    // });
-    const indexOfSlideToDelete = collection.slides.findIndex(slide => slide === slideToDelete)
-    collection.slides.splice(indexOfSlideToDelete, 1);
-    for (let i = indexOfSlideToDelete + 1; i < collection.slides.length; i++) {
-        collection.slides[i].index--
-    }
+    let slideFound = false
+    collection.slides.forEach(slide => {
+        if (slideFound) {
+            slide.index--
+        }
+        if (slide === slideToDelete) {
+            slidesCollection.slides.push(slide);
+            slideFound = true;
+        }
+    });
     return collection;
 }
 
