@@ -1,4 +1,4 @@
-enum TypeOfObject {
+enum ObjectTypes {
     slides,
     contents
 }
@@ -6,49 +6,49 @@ enum BackgroundTypes {
     color,
     picture
 }
-enum Size {
-    width,
-    height
+type Size = {
+    width: number,
+    height: number
 }
 type Presentation = {
-    id: number,
+    id: string,
     name: string,
-    slidesCollection: SlidesCollection,
-    owner: any
-}
-type SlidesCollection = {
-    id: number,
-    presentationId: number,
     slides: Slide[]
 }
 type Slide = {
-    id: number,
-    collectionId: number,
+    id: string,
+    presentationId: number,
     index: number,
-    contentObjects: any[],
+    contentObjects: (TextObj | PictureObj)[],
     background: Background
 }
 type ObjectsSelection = {
-    ids: number[],
-    objectType: TypeOfObject
+    ids: string[],
+    objectType: ObjectTypes
 }
-type TextObj = {
-    text: string,
-    x: number,
-    y: number,
-    size: Size,
-    fontSize: number,
-    family: string
-}
-type PictureObj = {
-    b64: string,
+type SlideObject = {
     x: number,
     y: number,
     size: Size
 }
+type TextObj = SlideObject & {
+    text: string,
+    fontSize: number,
+    family: string
+}
+type PictureObj = SlideObject & {
+    src: string
+}
 type Background = {
-    value: string,
-    type: BackgroundTypes
+    type: SolidBackground | ImageBackground
+}
+type SolidBackground = {
+    color: string,
+    type: 'solid'
+}
+type ImageBackground = {
+    src: string,
+    type: 'image'
 }
 
 // изменение названия презентации
@@ -60,24 +60,24 @@ function presentationNameChange(presentation:Presentation, newName: string): Pre
 }
 
 // добавление/удаление слайда
-function addSlide(slidesCollection:SlidesCollection, slide: Slide): SlidesCollection {
-    let newSlidesCollection = slidesCollection;
-    newSlidesCollection.slides.push(slide);
-    return newSlidesCollection;
+function addSlide(collection: Slide[], slide: Slide): Slide[] {
+    let newCollection = collection;
+    newCollection.push(slide);
+    return newCollection;
 }
-function deleteSlide(slidesCollection:SlidesCollection, slideToDelete: Slide): SlidesCollection {
-    let collection = slidesCollection;
+function deleteSlide(collection: Slide[], slideToDelete: Slide): Slide[] {
+    let newCollection = collection;
     let slideFound = false
-    collection.slides.forEach(slide => {
+    newCollection.forEach(slide => {
         if (slideFound) {
             slide.index--
         }
         if (slide === slideToDelete) {
-            slidesCollection.slides.push(slide);
+            newCollection.push(slide);
             slideFound = true;
         }
     });
-    return collection;
+    return newCollection;
 }
 
 // изменение позиции слайда
@@ -87,12 +87,12 @@ function slideIndexSet(slide:Slide, newIndex: number): Slide {
         index: newIndex
     }
 }
-function slidesOrderPushedByOne(slidesCollection: SlidesCollection, slideWithNewPosition: Slide): SlidesCollection {
-    let newSlidesCollection = slidesCollection;
+function slidesOrderPushedByOne(collection: Slide[], slideWithNewPosition: Slide): Slide[] {
+    let newCollection = collection;
     let slideFound = false;
     let slideToMove1: Slide;
     let slideToMove2: Slide;
-    newSlidesCollection.slides.forEach(slide => {
+    newCollection.forEach(slide => {
         if (slideFound) {
             slideToMove2 = slide;
             slide = slideToMove1;
@@ -104,7 +104,7 @@ function slidesOrderPushedByOne(slidesCollection: SlidesCollection, slideWithNew
             slideFound = true;
         }
     });
-    return newSlidesCollection;
+    return newCollection;
 }
 
 // добавление/удаление текста и картинки
@@ -122,7 +122,7 @@ function addPicture(slide: Slide, picture: PictureObj): Slide {
 }
 
 // изменение позиции текста/картинки
-function objectPositionSet(object:TextObj | PictureObj, x, y): TextObj | PictureObj {
+function objectPositionSet(object:TextObj | PictureObj, x: number, y: number): TextObj | PictureObj {
     return {
         ...object,
         x: x,
