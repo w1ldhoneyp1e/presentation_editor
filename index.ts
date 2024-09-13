@@ -17,8 +17,7 @@ type Presentation = {
 }
 type Slide = {
     id: string,
-    presentationId: number,
-    index: number,
+    index: number,    // Убрать, адаптировать остальной код под изменения
     contentObjects: (TextObj | PictureObj)[],
     background: Background
 }
@@ -34,7 +33,8 @@ type SlideObject = {
 type TextObj = SlideObject & {
     text: string,
     fontSize: number,
-    family: string
+    family: string,
+    color: string
 }
 type PictureObj = SlideObject & {
     src: string
@@ -65,14 +65,14 @@ function addSlide(collection: Slide[], slide: Slide): Slide[] {
     newCollection.push(slide);
     return newCollection;
 }
-function deleteSlide(collection: Slide[], slideToDelete: Slide): Slide[] {
+function deleteSlide(collection: Slide[], slideIdToDelete: string): Slide[] {
     let newCollection = collection;
     let slideFound = false
     newCollection.forEach(slide => {
         if (slideFound) {
             slide.index--
         }
-        if (slide === slideToDelete) {
+        if (slide.id === slideIdToDelete) {
             newCollection.push(slide);
             slideFound = true;
         }
@@ -159,6 +159,13 @@ function textFamilySet(text:TextObj, newTextFamily: string): TextObj {
     return {
         ...text,
         family: newTextFamily
+    }
+}
+
+function textColorSet(text:TextObj, newColor: string): TextObj {
+    return {
+        ...text,
+        color: newColor
     }
 }
 
