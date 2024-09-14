@@ -72,7 +72,12 @@ function addSlide(collection: Slide[]): Slide[] {
 }
 function deleteSlide(collection: Slide[], slideIdToDelete: string): Slide[] {
     let newCollection = collection;
-    newCollection.splice(newCollection.findIndex(slide => slide.id === slideIdToDelete), 1);
+    for (let i = 0; i < newCollection.length; i++) {
+        if (newCollection[i].id === slideIdToDelete) {
+            newCollection.splice(i);
+            break;
+        }
+    }
     return newCollection;
 }
 
