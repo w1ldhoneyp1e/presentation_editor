@@ -17,13 +17,12 @@ type Presentation = {
 }
 type Slide = {
     id: string,
-    index: number,    // Убрать, адаптировать остальной код под изменения
     contentObjects: (TextObj | PictureObj)[],
     background: Background
 }
 type ObjectsSelection = {
-    ids: string[],
-    objectType: ObjectTypes
+    objectsIds: string[],
+    slidesIds: string[]
 }
 type SlideObject = {
     x: number,
@@ -60,64 +59,84 @@ function presentationNameChange(presentation:Presentation, newName: string): Pre
 }
 
 // добавление/удаление слайда
-function addSlide(collection: Slide[], slide: Slide): Slide[] {
+function addSlide(collection: Slide[]): Slide[] {
+    let newSlide: Slide;
+    newSlide = {
+        id: getUID(),
+        contentObjects: [],
+        background: getDefaultBackground()
+    }
     let newCollection = collection;
-    newCollection.push(slide);
+    newCollection.push(newSlide);
     return newCollection;
 }
 function deleteSlide(collection: Slide[], slideIdToDelete: string): Slide[] {
     let newCollection = collection;
-    let slideFound = false
-    newCollection.forEach(slide => {
-        if (slideFound) {
-            slide.index--
-        }
-        if (slide.id === slideIdToDelete) {
-            newCollection.push(slide);
-            slideFound = true;
-        }
-    });
+    newCollection.splice(newCollection.findIndex(slide => slide.id === slideIdToDelete), 1);
     return newCollection;
 }
 
 // изменение позиции слайда
-function slideIndexSet(slide:Slide, newIndex: number): Slide {
-    return {
-        ...slide,
-        index: newIndex
-    }
-}
-function slidesOrderPushedByOne(collection: Slide[], slideWithNewPosition: Slide): Slide[] {
+function slidesOrderPushedByOne(collection: Slide[], slideId: string, positionTo: number): Slide[] {
     let newCollection = collection;
-    let slideFound = false;
-    let slideToMove1: Slide;
-    let slideToMove2: Slide;
-    newCollection.forEach(slide => {
-        if (slideFound) {
-            slideToMove2 = slide;
-            slide = slideToMove1;
-            slideToMove1 = slideToMove2;
+    let slideToMove: Slide;
+    let indexNow = 0;
+    for (const slide of collection) {
+        if (slide.id === slideId) {
+            slideToMove = slide;
+            break;
         }
-        if (slide.index === slideWithNewPosition.index && !slideFound) {
-            slideToMove1 = slide;
-            slide = slideWithNewPosition;
-            slideFound = true;
+        indexNow++;
+    };
+    slideToMove = collection[indexNow];
+    if (positionTo > indexNow) {
+        for (let i = indexNow; i < positionTo; i++) {
+            newCollection[i] = newCollection[i + 1]; 
         }
-    });
+    }
+    if (positionTo < indexNow) {
+        for (let i = indexNow; i > positionTo; i--) {
+            newCollection[i] = newCollection[i - 1]; 
+        }
+    }
+    newCollection[positionTo] = slideToMove;
     return newCollection;
 }
 
 // добавление/удаление текста и картинки
-function addText(slide: Slide, text: TextObj): Slide {
+function createText(slide: Slide, value: string): Slide {
+    let newText: TextObj;
+    newText = {
+        x: 0,
+        y: 0,
+        size: {
+            width: 100,
+            height: 30
+        },
+        text: value,
+        fontSize: 11,
+        family: 'Times New Roman',
+        color: 'black'
+    }
     return {
         ...slide,
-        contentObjects: [...slide.contentObjects, text]
+        contentObjects: [...slide.contentObjects, newText]
     }
 }
-function addPicture(slide: Slide, picture: PictureObj): Slide {
+function createPicture(slide: Slide, src: string): Slide {
+    let newPic: PictureObj;
+    newPic = {
+        x: 0,
+        y: 0,
+        size: {
+            width: 200,
+            height: 200
+        },
+        src: src
+    }
     return {
         ...slide,
-        contentObjects: [...slide.contentObjects, picture]
+        contentObjects: [...slide.contentObjects, newPic]
     }
 }
 
@@ -139,7 +158,7 @@ function objectSizeSet(object:TextObj | PictureObj, size: Size): TextObj | Pictu
 }
 
 // изменение текста
-function textSet(text:TextObj, newText: string): TextObj {
+function textValueSet(text:TextObj, newText: string): TextObj {
     return {
         ...text,
         text: newText
@@ -175,4 +194,21 @@ function slideBackgroundSet(slide:Slide, newBackground: Background): Slide {
         ...slide,
         background: newBackground
     }
+}
+
+function getUID(): string {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);;
+}
+
+function getDefaultBackground(): Background {
+    let background: Background;
+    let defaultSolid: SolidBackground;
+    defaultSolid = {
+        color: 'white',
+        type: 'solid'
+    };
+    background = {
+        type: defaultSolid
+    }
+    return background;
 }
